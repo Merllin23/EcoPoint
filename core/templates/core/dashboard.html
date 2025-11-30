@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EcoPoint - Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+:root{--eco-green:#2e8b57;--eco-light:#e8f5ee;}
+body{background:linear-gradient(180deg,#f7fff9,white);}
+.navbar{background:var(--eco-green);}
+.navbar-brand, .nav-link, .btn-eco{color:white !important;}
+.header-card{border-left:6px solid var(--eco-green);}
+.card-eco{border:1px solid #e6efe8;}
+.badge-eco{background:var(--eco-green);}
+.footer{font-size:.9rem;color:#666;padding:1rem 0;text-align:center;}
+</style>
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="#"><strong>EcoPoint</strong></a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto">
+
+        <li class="nav-item"><a class="nav-link active" href="#">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Registrar</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Clasificar</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Transformación</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Estadísticas</a></li>
+
+        {% if usuario.rol == "admin" %}
+        <li class="nav-item"><a class="nav-link" href="#">Panel Gestor</a></li>
+        {% endif %}
+
+        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a></li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <div class="row mb-3">
+
+    <!-- PERFIL Y ESTADÍSTICAS -->
+    <div class="col-md-8">
+      <div class="card card-eco p-3">
+        <div class="d-flex justify-content-between align-items-center">
+
+          <div>
+            <h4 class="mb-0">Hola, {{ usuario.nombre|default:"Usuario" }}</h4>
+            <small class="text-muted">Registro y seguimiento de tus aportes</small>
+          </div>
+
+          <div class="text-end">
+            <div class="badge badge-eco rounded-pill px-3 py-2">
+              Puntos: <strong>{{ user_points|default:"0" }}</strong>
+            </div>
+            <div class="text-muted small mt-1">Ranking: #{{ user_rank|default:"-" }}</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="row mt-3">
+
+        <!-- ÚLTIMOS REGISTROS -->
+        <div class="col-md-6">
+          <div class="card card-eco p-3">
+            <h6>Últimos registros</h6>
+
+            {% if ultimos_registros %}
+            <ul class="list-group list-group-flush">
+              {% for r in ultimos_registros %}
+              <li class="list-group-item">
+                {{ r.tipo|default:"Desconocido" }} — {{ r.peso|default:"0" }} kg — {{ r.estado|default:"Pendiente" }}
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-muted">Aún no tienes registros.</p>
+            {% endif %}
+
+          </div>
+        </div>
+
+        <!-- IMPACTO -->
+        <div class="col-md-6">
+          <div class="card card-eco p-3">
+            <h6>Impacto estimado</h6>
+            <p class="mb-0">Material reciclado: <strong>{{ impacto_kg|default:"0" }} kg</strong></p>
+            <p class="mb-0">CO₂ evitado aprox.: <strong>{{ impacto_co2|default:"0" }} kg</strong></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ACCIONES RÁPIDAS -->
+    <div class="col-md-4">
+      <div class="card p-3 header-card">
+        <h6 class="mb-1">Acciones rápidas</h6>
+
+        <a class="btn btn-outline-success w-100 mb-2" href="#">Registrar Material</a>
+        <a class="btn btn-outline-success w-100 mb-2" href="#">Clasificar</a>
+        <a class="btn btn-outline-success w-100 mb-2" href="#">Mis Estadísticas</a>
+
+        {% if usuario.rol == "admin" %}
+        <hr>
+        <a class="btn btn-outline-danger w-100" href="#">Panel Administrador</a>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">EcoPoint - Proyecto de reciclaje Yanahuara</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

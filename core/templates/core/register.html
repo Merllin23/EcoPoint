@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EcoPoint - Registro</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+:root{--eco-green:#2e8b57;--eco-light:#e8f5ee;}
+body{background:linear-gradient(180deg,#f7fff9,white);}
+.card-eco{border:1px solid #e6efe8;}
+.form-control:focus{box-shadow:0 0 0 .2rem rgba(46,139,87,.25);border-color:var(--eco-green);}
+</style>
+
+</head>
+<body>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+
+      <a href="{% url 'login' %}" class="btn btn-link mb-3">&larr; Volver al inicio de sesión</a>
+
+      <div class="card card-eco shadow-sm">
+        <div class="card-body">
+          <h3 class="card-title text-center" style="color:var(--eco-green)">Crear cuenta</h3>
+
+          <!-- BLOQUE DE MENSAJES -->
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert 
+                  {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} 
+                  alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="POST" action="{% url 'register' %}">
+              {% csrf_token %}
+
+              <div class="mb-3">
+                <label class="form-label">Nombre completo</label>
+                <input name="nombre" class="form-control" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Correo electrónico</label>
+                <input name="correo" type="email" class="form-control" required>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Contraseña</label>
+                  <input name="contrasena" type="password" class="form-control" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Confirmar contraseña</label>
+                  <input name="password2" type="password" class="form-control" required>
+                </div>
+              </div>
+
+              <div class="d-grid">
+                <button class="btn" style="background:var(--eco-green);color:white">Crear cuenta</button>
+              </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
