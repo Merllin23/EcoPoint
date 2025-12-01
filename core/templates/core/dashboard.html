@@ -16,13 +16,12 @@ body{background:linear-gradient(180deg,#f7fff9,white);}
 .badge-eco{background:var(--eco-green);}
 .footer{font-size:.9rem;color:#666;padding:1rem 0;text-align:center;}
 </style>
-
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg">
   <div class="container">
-    <a class="navbar-brand" href="#"><strong>EcoPoint</strong></a>
+    <a class="navbar-brand" href="{% url 'dashboard' %}"><strong>EcoPoint</strong></a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
       <span class="navbar-toggler-icon"></span>
@@ -30,19 +29,21 @@ body{background:linear-gradient(180deg,#f7fff9,white);}
 
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav ms-auto">
-
-        <li class="nav-item"><a class="nav-link active" href="#">Inicio</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Registrar</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Clasificar</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Transformación</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Estadísticas</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{% url 'dashboard' %}">Inicio</a></li>
 
         {% if usuario.rol == "admin" %}
-        <li class="nav-item"><a class="nav-link" href="#">Panel Gestor</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'registrar' %}">Registrar</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'reportes' %}">Reportes</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'transformacion' %}">Transformación</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'estadisticas' %}">Estadísticas</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'panel_gestor' %}">Panel Gestor</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'registrar' %}">Registrar</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'transformacion' %}">Transformación</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'estadisticas' %}">Estadísticas</a></li>
         {% endif %}
 
         <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a></li>
-
       </ul>
     </div>
   </div>
@@ -55,7 +56,6 @@ body{background:linear-gradient(180deg,#f7fff9,white);}
     <div class="col-md-8">
       <div class="card card-eco p-3">
         <div class="d-flex justify-content-between align-items-center">
-
           <div>
             <h4 class="mb-0">Hola, {{ usuario.nombre|default:"Usuario" }}</h4>
             <small class="text-muted">Registro y seguimiento de tus aportes</small>
@@ -67,7 +67,6 @@ body{background:linear-gradient(180deg,#f7fff9,white);}
             </div>
             <div class="text-muted small mt-1">Ranking: #{{ user_rank|default:"-" }}</div>
           </div>
-
         </div>
       </div>
 
@@ -82,7 +81,15 @@ body{background:linear-gradient(180deg,#f7fff9,white);}
             <ul class="list-group list-group-flush">
               {% for r in ultimos_registros %}
               <li class="list-group-item">
-                {{ r.tipo|default:"Desconocido" }} — {{ r.peso|default:"0" }} kg — {{ r.estado|default:"Pendiente" }}
+                {{ r.tipo|default:"Desconocido" }} — {{ r.peso|default:"0" }} kg — 
+                {% if r.ultima_clasificacion %}
+                  <strong>{{ r.ultima_clasificacion.estado }}</strong>
+                  {% if r.ultima_clasificacion.comentario_gestor %}
+                    <br><small class="text-muted">Comentario: {{ r.ultima_clasificacion.comentario_gestor }}</small>
+                  {% endif %}
+                {% else %}
+                  <strong>Pendiente</strong>
+                {% endif %}
               </li>
               {% endfor %}
             </ul>
@@ -109,14 +116,13 @@ body{background:linear-gradient(180deg,#f7fff9,white);}
     <div class="col-md-4">
       <div class="card p-3 header-card">
         <h6 class="mb-1">Acciones rápidas</h6>
-
-        <a class="btn btn-outline-success w-100 mb-2" href="#">Registrar Material</a>
-        <a class="btn btn-outline-success w-100 mb-2" href="#">Clasificar</a>
+        <a class="btn btn-outline-success w-100 mb-2" href="{% url 'registrar' %}">Registrar Material</a>
+        <a class="btn btn-outline-success w-100 mb-2" href="#">Transformación</a>
         <a class="btn btn-outline-success w-100 mb-2" href="#">Mis Estadísticas</a>
 
         {% if usuario.rol == "admin" %}
         <hr>
-        <a class="btn btn-outline-danger w-100" href="#">Panel Administrador</a>
+        <a class="btn btn-outline-danger w-100" href="{% url 'panel_gestor' %}">Panel Administrador</a>
         {% endif %}
       </div>
     </div>
