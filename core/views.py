@@ -61,14 +61,9 @@ def dashboard_view(request):
 
     # Últimos 5 registros del usuario
     ultimos_registros = Material.objects.filter(usuario=usuario).order_by('-id_material')[:5]
+
     for m in ultimos_registros:
         m.ultima_clasificacion = m.clasificacion_set.order_by('-fecha_registro').first()
-
-
-    # Para cada material, obtenemos su última clasificación
-    for m in ultimos_registros:
-        ultima_clasificacion = m.clasificacion_set.order_by('-fecha_registro').first()
-        m.ultima_clasificacion = ultima_clasificacion
 
     # Impacto total solo de materiales aceptados
     aceptados = Material.objects.filter(usuario=usuario, clasificacion__estado="Aceptada")
@@ -77,14 +72,13 @@ def dashboard_view(request):
 
     context = {
         'usuario': usuario,
-        'user_points': usuario.puntos,
+        'user_points': usuario.puntos,  # siempre del usuario en DB
         'ultimos_registros': ultimos_registros,
         'impacto_kg': impacto_kg,
         'impacto_co2': impacto_co2,
     }
 
     return render(request, 'core/dashboard.html', context)
-
 
 def logout_view(request):
     request.session.flush()

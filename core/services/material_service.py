@@ -1,5 +1,6 @@
 from core.models import Material, Clasificacion, Usuario
 from datetime import datetime
+from decimal import Decimal
 
 class MaterialService:
 
@@ -7,8 +8,6 @@ class MaterialService:
         """
         Registra un material y su clasificación, sumando puntos al usuario.
         """
-
-        # Obtener usuario
         try:
             usuario = Usuario.objects.get(id_usuario=usuario_id)
         except Usuario.DoesNotExist:
@@ -18,15 +17,12 @@ class MaterialService:
         material = Material.objects.create(
             usuario=usuario,
             tipo=tipo,
-            cantidad=cantidad,
-            peso=peso,
+            cantidad=Decimal(cantidad),
+            peso=Decimal(peso),
             estado=estado,
             fotografia=foto.name if foto else None
-            
         )
-        
 
-        # Crear clasificación asociada
         Clasificacion.objects.create(
             material=material,
             sugerencia=sugerencia,
@@ -34,7 +30,7 @@ class MaterialService:
             fecha_registro=datetime.now()
         )
 
-        # Sumar puntos al usuario
+        # Sumar puntos al usuario (solo por registrar)
         usuario.puntos += 10
         usuario.save()
 
