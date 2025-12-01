@@ -1,0 +1,343 @@
+1. Introducción
+
+El presente documento describe el diseño UX/UI desarrollado para el sistema EcoPoint. Incluye la guía visual, los principios de experiencia de usuario aplicados, el diseño de pantallas, los flujos de interacción y la estructura general utilizada para crear los prototipos en Figma.
+
+Su propósito es servir como referencia para desarrolladores, evaluadores y diseñadores durante el proceso de implementación del frontend.
+
+2. Objetivos de la Interfaz
+
+Proporcionar una interfaz clara y amigable para que los usuarios registren sus materiales reciclables.
+
+Apoyar al usuario con un módulo de clasificación automatizada (según BPMN 2).
+
+Mostrar información transparente, visual e informativa mediante estadísticas.
+
+Facilitar la revisión y aprobación de materiales por parte del gestor.
+
+Mantener coherencia visual en todo el sistema.
+
+Garantizar una navegación ordenada y entendible tanto para usuarios finales como para administradores.
+
+3. Paleta de Colores
+
+La paleta fue seleccionada para transmitir naturaleza, reciclaje y calidez, sin perder contraste.
+
+Elemento	Color	Código
+Principal	Marrón cálido	#C5925F
+Fondo principal	Blanco	#FFFFFF
+Texto principal	Negro	#000000
+Texto alterno	Blanco	#FFFFFF
+Bordes y líneas guía	Gris claro	#D9D9D9
+4. Tipografía
+
+Familia recomendada: Inter / Roboto / Poppins
+
+Jerarquía tipográfica:
+
+Títulos: 24–32 px, peso 600
+
+Subtítulos: 18–20 px, peso 500
+
+Texto: 14–16 px, peso 400
+
+Etiquetas y campos: 12–14 px
+
+5. Componentes UI
+5.1 Botones
+
+Botón primario
+
+Fondo: #C5925F
+
+Texto: Blanco
+
+Borde: none
+
+Hover: tono más oscuro
+
+Botón secundario
+
+Fondo: Blanco
+
+Borde: #C5925F
+
+Texto: #C5925F
+
+5.2 Formularios
+
+Campos con bordes suaves (4–8 px).
+
+Etiquetas encima del campo (no dentro).
+
+Mensajes de error en rojo.
+
+Inputs con estados: normal, activo, error, deshabilitado.
+
+5.3 Tarjetas informativas (Cards)
+
+Utilizadas en Dashboard y Panel Gestor.
+
+Fondo blanco
+
+Sombras suaves
+
+Métricas grandes y legibles
+
+5.4 Tablas
+
+Utilizadas en Panel Gestor y Estadísticas.
+
+Estilo minimalista
+
+Cabecera destacada
+
+Acciones a la derecha (Aprobar / Rechazar)
+
+6. Estructura General de Navegación
+6.1 Menú principal del Usuario Final
+
+Inicio
+
+Registrar
+
+Estadísticas
+
+Transformación
+
+6.2 Menú del Administrador / Gestor
+
+Panel Gestor
+
+Registros pendientes
+
+Transformación
+
+Reportes Globales
+
+7. Flujo UX Basado en los BPMN oficiales
+
+A continuación se describe cómo los BPMN del proyecto se convierten en flujos UX reales dentro del sistema.
+
+7.1 Flujo UX – Registro de Material (BPMN 1)
+
+Pantallas involucradas:
+
+Login
+
+Dashboard
+
+Registrar → Clasificación (intermedia)
+
+Registrar → Llenar formulario
+
+Confirmación
+
+Notificaciones posteriores
+
+Flujo UX:
+
+El usuario inicia sesión.
+
+Selecciona “Registrar”.
+
+Sistema muestra la pantalla de clasificación preliminar (nuevo diseño):
+
+Material seleccionado
+
+Sugerencia del sistema
+
+Observaciones
+
+Botón “Siguiente paso”
+
+Luego, el usuario llena el formulario de registro:
+
+Cantidad
+
+Peso
+
+Estado
+
+Fotografía
+
+Botón “Enviar registro”
+
+El sistema valida y envía a revisión del gestor.
+
+El usuario recibe notificación de aprobación/rechazo.
+
+7.2 Flujo UX – Clasificación (BPMN 2)
+
+Este proceso está integrado en la primera parte del registro.
+
+Pantalla: Proceso de Clasificación automática
+
+Contenido visual:
+
+Mini tarjeta del material
+
+Etiquetas del sistema (PET 1 / Vidrio templado / etc.)
+
+Controles para aceptar o corregir la clasificación
+
+Botón de continuar
+
+7.3 Flujo UX – Proceso de Transformación (BPMN 3)
+
+Pantallas involucradas:
+
+Proceso de transformación (vista usuario)
+
+Gestión de transformación (vista gestor)
+
+Interfaz del Usuario Final incluye:
+
+Línea de tiempo del proceso (paso 1 a 5)
+
+Cada etapa muestra:
+
+Descripción
+
+Estado actual
+
+Información educativa
+
+Interfaz del Gestor incluye:
+
+Selección de lote
+
+Menú desplegable de etapa
+
+Registrar avance
+
+Guardar
+
+7.4 Flujo UX – Estadísticas y Reportes (BPMN 4)
+
+Vista del Usuario Final:
+
+KPIs personales
+
+Gráficos (barras, pastel)
+
+Ranking comunitario
+
+Historial resumido
+
+Vista del Gestor:
+
+Filtros avanzados:
+
+Fecha
+
+Material
+
+Zona
+
+Dashboard global
+
+Exportación de reportes
+
+8. Prototipos UI – Descripción de Pantallas
+8.1 Login
+
+Contenedor centrado
+
+Logo de EcoPoint
+
+Inputs de correo y contraseña
+
+Botón principal
+
+Enlace “Crear cuenta”
+
+8.2 Dashboard
+
+Elementos:
+
+Bienvenida personalizada
+
+Estadísticas rápidas
+
+Atajos visuales
+
+Historial resumido
+
+8.3 Registrar Material – Pantalla 1 (Clasificación)
+
+Tarjeta con información del material
+
+Sugerencia automática
+
+Campo para observaciones
+
+Botón Siguiente
+
+8.4 Registrar Material – Pantalla 2 (Formulario final)
+
+Cantidad
+
+Peso
+
+Estado
+
+Fotografía
+
+Botón Enviar registro
+
+8.5 Estadísticas
+
+Gráficos dinámicos
+
+Colores consistentes
+
+KPIs numéricos
+
+Filtros simples
+
+8.6 Panel Gestor
+
+Incluye:
+
+Estadísticas rápidas
+
+Tabla de registros pendientes
+
+Acciones (Aprobar / Rechazar)
+
+Panel de Transformación
+
+Reportes globales
+
+9. Principios UX aplicados
+9.1 Consistencia visual
+
+Uso uniforme de colores, tipografías y componentes.
+
+9.2 Jerarquía informativa
+
+Títulos destacados, secciones claras, uso de espacio en blanco.
+
+9.3 Prevención de errores
+
+Validaciones, mensajes claros y formularios guiados.
+
+9.4 Modularidad
+
+Cada proceso se divide en pasos pequeños para reducir carga cognitiva.
+
+9.5 Accesibilidad
+
+Colores con contraste, controles amplios y lecturas claras.
+
+10. Consideraciones finales para desarrolladores
+
+Mantener los estilos dictados aquí como guía oficial.
+
+Alinear la implementación con los prototipos Figma.
+
+Revisar los flujos UX en relación con los BPMN para asegurar coherencia entre lógica y diseño.
+
+Todos los formularios deben incluir validación visual.
+
+Cualquier cambio debe reflejarse tanto en Figma como en esta documentación.
