@@ -34,7 +34,7 @@ body { background:linear-gradient(180deg,#f7fff9,white); }
 
         {% if usuario.rol == "admin" %}
           <li class="nav-item"><a class="nav-link" href="{% url 'registrar' %}">Registrar</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Reportes</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'reportes' %}">Reportes</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'transformacion' %}">Transformación</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'estadisticas' %}">Estadísticas</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'panel_gestor' %}">Panel Gestor</a></li>

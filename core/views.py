@@ -360,3 +360,92 @@ def estadisticas_view(request):
     }
 
     return render(request, "core/estadisticas.html", contexto)
+
+
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from core.models import Material
+import csv
+from django.db.models import Sum
+from django.utils.dateparse import parse_date
+from datetime import datetime
+
+def reportes_view(request):
+    # Verificar sesión
+    if 'usuario_id' not in request.session or request.session['usuario_rol'] != 'admin':
+        return redirect('dashboard')
+
+    # Filtros simples
+    zona = request.GET.get('zona')
+    tipo_material = request.GET.get('tipo_material')
+
+    materiales = Material.objects.all()
+
+    if zona and zona != "Todas":
+        materiales = materiales.filter(usuario__zona=zona)
+    if tipo_material and tipo_material != "Todos":
+        materiales = materiales.filter(tipo=tipo_material)
+
+    # Estadísticas rápidas
+    total_kg = materiales.aggregate(total=Sum('peso'))['total'] or 0
+    distribucion = materiales.values('tipo').annotate(kg=Sum('peso')).order_by('tipo')
+
+    context = {
+        "materiales": materiales,
+        "total_kg": round(total_kg, 2),
+        "distribucion": distribucion,
+        "filtros": {
+            "zona": zona or 'Todas',
+            "tipo_material": tipo_material or 'Todos'
+        }
+    }
+
+    return render(request, 'core/reportes.html', context)
+
+
+def exportar_reporte_csv(request):
+    # Verificar sesión
+    if 'usuario_id' not in request.session or request.session['usuario_rol'] != 'admin':
+        return redirect('dashboard')
+
+    # Filtros
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+    zona = request.GET.get('zona')
+    tipo_material = request.GET.get('tipo_material')
+
+    materiales = Material.objects.all()
+
+    if fecha_inicio:
+        materiales = materiales.filter(usuario__fecha_creacion__gte=parse_date(fecha_inicio))
+    if fecha_fin:
+        materiales = materiales.filter(usuario__fecha_creacion__lte=parse_date(fecha_fin))
+    if zona and zona != "Todas":
+        materiales = materiales.filter(usuario__zona=zona)
+    if tipo_material and tipo_material != "Todos":
+        materiales = materiales.filter(tipo=tipo_material)
+
+    # Nombre del archivo con fecha y hora
+    fecha_actual = datetime.now().strftime("%Y%m%d_%H%M")
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': f'attachment; filename="reporte_materiales_{fecha_actual}.csv"'},
+    )
+
+    writer = csv.writer(response, delimiter=';')
+    
+    # Encabezados
+    writer.writerow(['USUARIO', 'ZONA', 'TIPO', 'CANTIDAD', 'PESO (KG)', 'ESTADO', 'FOTOGRAFÍA'])
+
+    for m in materiales:
+        writer.writerow([
+            m.usuario.nombre or '-',
+            getattr(m.usuario, 'zona', '-') or '-',
+            m.tipo or '-',
+            f"{m.cantidad:.2f}" if m.cantidad is not None else '-',
+            f"{m.peso:.2f}" if m.peso is not None else '-',
+            m.estado or '-',
+            m.fotografia or '-'
+        ])
+
+    return response

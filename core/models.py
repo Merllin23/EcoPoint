@@ -73,3 +73,4 @@ class Reporte(models.Model):
 
     def __str__(self):
         return f"Reporte {self.tipo} de {self.usuario.nombre}"
+    

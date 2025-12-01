@@ -1,6 +1,7 @@
 from django.urls import path
 from django.shortcuts import redirect
 from . import views
+from core.views import reportes_view, exportar_reporte_csv
 
 urlpatterns = [
     path('', lambda request: redirect('login')),  
@@ -12,5 +13,9 @@ urlpatterns = [
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('logout/', views.logout_view, name='logout'),
     path('estadisticas/', views.estadisticas_view, name='estadisticas'),
+
+    #para exportar
+    path('reportes/', reportes_view, name='reportes'),
+    path('reportes/exportar/', exportar_reporte_csv, name='exportar_reporte_csv'),
 
 ]
