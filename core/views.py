@@ -6,11 +6,14 @@ from core.services.usuario_service import UsuarioService
 from core.services.material_service import MaterialService
 from decimal import Decimal
 from core.services.GestorService import GestorService
+from core.services.TransformacionService import TransformacionService
+
 
 
 usuario_service = UsuarioService()
 material_service = MaterialService()
 gestor_service = GestorService()
+transformacion_service = TransformacionService()
 
 
 def login_view(request):
@@ -68,11 +71,11 @@ def dashboard_view(request):
     # Impacto total solo de materiales aceptados
     aceptados = Material.objects.filter(usuario=usuario, clasificacion__estado="Aceptada")
     impacto_kg = sum([float(m.peso) for m in aceptados])
-    impacto_co2 = impacto_kg * 0.8  # ejemplo de cálculo de CO2 evitado
+    impacto_co2 = impacto_kg * 0.8  
 
     context = {
         'usuario': usuario,
-        'user_points': usuario.puntos,  # siempre del usuario en DB
+        'user_points': usuario.puntos,      
         'ultimos_registros': ultimos_registros,
         'impacto_kg': impacto_kg,
         'impacto_co2': impacto_co2,
@@ -172,6 +175,7 @@ def panel_gestor_view(request):
         messages.error(request, "No tienes permisos para acceder a esta página.")
         return redirect('dashboard')
 
+    usuario = Usuario.objects.get(id_usuario=request.session['usuario_id'])
     pendientes = gestor_service.listar_pendientes()
     stats = gestor_service.estadisticas_rapidas()
 
@@ -190,7 +194,169 @@ def panel_gestor_view(request):
         return redirect('panel_gestor')
 
     context = {
+        "usuario": usuario,  
         "pendientes": pendientes,
         "stats": stats
     }
     return render(request, "core/panel_gestor.html", context)
+
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from core.models import Usuario
+from core.services.TransformacionService import (
+    TransformacionService,
+    obtener_etapas,
+    etapa_actual,
+)
+
+transformacion_service = TransformacionService()
+
+def transformacion_view(request):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+
+    usuario = Usuario.objects.get(id_usuario=request.session['usuario_id'])
+    materiales = transformacion_service.listar_materiales(usuario)
+
+    if request.method == "POST" and usuario.rol == "admin":
+        material_id = request.POST.get("material_id")
+        ok, msg = transformacion_service.avanzar_etapa(material_id)
+
+        if ok:
+            messages.success(request, msg)
+        else:
+            messages.error(request, msg)
+
+        return redirect("transformacion")
+
+
+    materiales_proceso = 0
+    materiales_completados = 0
+    materiales_final = []
+
+    for m in materiales:
+        etapas_m = obtener_etapas(m)
+        actual = etapa_actual(m)
+
+        if actual is None:
+            etapa_index = -1
+        else:
+            etapa_index = etapas_m.index(actual)
+
+        porcentaje = int(((etapa_index + 1) / len(etapas_m)) * 100) if etapa_index >= 0 else 0
+
+        # Estadísticas
+        if actual == etapas_m[-1]:
+            materiales_completados += 1
+        else:
+            materiales_proceso += 1
+
+        # Mensaje educativo según etapa actual
+        if actual is None:
+            mensaje_etapa = "El proceso aún no comienza."
+        else:
+            mensaje_etapa = transformacion_service.obtener_mensaje(actual)
+
+        materiales_final.append({
+            "id_material": m.id_material,
+            "tipo_material": m.tipo,
+            "usuario": m.usuario,
+            "porcentaje": porcentaje,
+            "etapa_actual": etapa_index,
+            "etapa_actual_nombre": actual if actual else "No iniciado",
+            "mensaje_etapa": mensaje_etapa,
+            "etapas": etapas_m,
+        })
+
+    context = {
+        "usuario": usuario,
+        "materiales": materiales_final,
+        "stats": {
+            "materiales_proceso": materiales_proceso,
+            "materiales_completados": materiales_completados
+        }
+    }
+
+    return render(request, "core/transformacion.html", context)
+
+
+from django.shortcuts import render, redirect
+from django.db.models import Sum
+from core.models import Material, Usuario
+import random
+
+def estadisticas_view(request):
+    # Verificar sesión
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+
+    usuario_id = request.session['usuario_id']
+    usuario = Usuario.objects.get(id_usuario=usuario_id)
+
+    materiales = Material.objects.filter(usuario_id=usuario_id)
+
+    # Total reciclado
+    total_kg = materiales.aggregate(total=Sum("peso"))["total"] or 0
+
+    # === AGRUPACIÓN BONITA DE TIPOS ===
+    MAPEO = {
+        "PET1": "Plástico",
+        "PET2": "Plástico",
+        "PET3": "Plástico",
+        "Plástico": "Plástico",
+        "Plastico": "Plástico",
+        "platico": "Plástico",
+        "Plastico mixto": "Plástico",
+
+        "Carton": "Cartón",
+        "Cartón": "Cartón",
+
+        "Vidrio": "Vidrio",
+
+    }
+
+    # Convertir a una lista limpia agrupada
+    materiales_limpios = []
+
+    for item in materiales.values("tipo", "peso"):
+        tipo_original = item["tipo"]
+        categoria = MAPEO.get(tipo_original, tipo_original)  
+
+        materiales_limpios.append({
+            "categoria": categoria,
+            "peso": item["peso"]
+        })
+
+    # Agrupar suma por categoría
+    distribucion = {}
+    for m in materiales_limpios:
+        cat = m["categoria"]
+        distribucion[cat] = distribucion.get(cat, 0) + m["peso"]
+
+    # Convertir a lista para el template
+    distribucion_final = [
+        {"categoria": cat, "kg": round(peso, 2)}
+        for cat, peso in distribucion.items()
+    ]
+
+    # Consejos dinámicos
+    consejos = [
+        "Separa plásticos por tipo para facilitar su reciclaje.",
+        "Lava los envases antes de reciclarlos.",
+        "Aplasta botellas y latas para ahorrar espacio.",
+        "Reutiliza frascos de vidrio antes de reciclarlos.",
+        "Reduce el uso de plástico de un solo uso."
+    ]
+
+    contexto = {
+        "usuario": usuario,
+        "stats": {
+            "total_kg": round(total_kg, 2),
+            "puntos": usuario.puntos,
+            "distribucion": distribucion_final
+        },
+        "consejo": random.choice(consejos)
+    }
+
+    return render(request, "core/estadisticas.html", contexto)

@@ -39,27 +39,26 @@ body{background:linear-gradient(180deg,#f7fff9,white);}
 
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav ms-auto">
-
         <li class="nav-item"><a class="nav-link active" href="{% url 'dashboard' %}">Inicio</a></li>
 
         {% if usuario.rol == "admin" %}
           <li class="nav-item"><a class="nav-link" href="{% url 'registrar' %}">Registrar</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Reportes</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Transformación</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Estadísticas</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Panel Gestor</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'transformacion' %}">Transformación</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'estadisticas' %}">Estadísticas</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'panel_gestor' %}">Panel Gestor</a></li>
         {% else %}
           <li class="nav-item"><a class="nav-link" href="{% url 'registrar' %}">Registrar</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Transformación</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Estadísticas</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'transformacion' %}">Transformación</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'estadisticas' %}">Estadísticas</a></li>
         {% endif %}
 
         <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a></li>
-
       </ul>
     </div>
   </div>
 </nav>
+
 
 <div class="container py-4">
   <div class="row justify-content-center">
